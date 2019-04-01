@@ -1,0 +1,147 @@
+  <!-- 顶点着色器 -->
+  <script id="vertexShader" type="x-shader/x-vertex">
+    // varying关键字声明一个变量表示顶点纹理坐标插值后的结果
+    varying vec2 vUv;
+    void main(){
+      // 顶点纹理坐标uv数据进行插值计算
+      vUv = uv;
+      // 投影矩阵projectionMatrix、视图矩阵viewMatrix、模型矩阵modelMatrix
+      gl_Position = projectionMatrix*viewMatrix*modelMatrix*vec4( position, 1.0 );
+    }
+  </script>
+  <!-- 片元着色器 -->
+  <script id="fragmentShader" type="x-shader/x-fragment">
+    // 声明一个时间变量用来控制UV动画
+    uniform float time;
+    // 声明一个纹理对象变量
+    uniform sampler2D texture;
+    // 顶点片元化后有多少个片元就有多少个纹理坐标数据vUv
+    varying vec2 vUv;
+    void main() {
+      vec2 newT= vUv + vec2( -0.02, 0.02 ) * time;
+      //通过偏移后的纹理坐标newT采样像素
+      gl_FragColor = texture2D( texture, newT );
+      // 大气层整体透明度增加
+      gl_FragColor.a *=0.6;
+    }
+  </script>
+
+
+
+
+<!-- 3D -->
+<script type="text/javascript">
+	var scene,camera,renderer;
+	scene=new THREE.Scene();
+	camera=new THREE.PerspectiveCamera(45,9/6,0.1,100)
+	camera.position.set(0,1.1,2.94);
+	camera.lookAt(scene.position);
+	
+	renderer=new THREE.WebGLRenderer({ antialias: true,alpha:true });
+	renderer.setSize(800,500);
+	renderer.domElement.style.width="180px";
+	renderer.domElement.style.height="120px";
+	$('#logo').append(renderer.domElement);
+	renderer.setClearColor(0xffffff,0);
+	
+	var amlight=new THREE.AmbientLight(0xffffff);
+	scene.add(amlight);
+	
+	var pointL=new THREE.PointLight(0xffffff);
+	pointL.position.set(0,5,5);
+	scene.add(pointL);
+	
+	//logo
+	var texture=new THREE.TextureLoader().load('__STATIC__/home/img/diqiu.jpg');
+	
+	
+	var sphereGeo=new THREE.SphereGeometry(1,20,20);
+	var sphMat=new THREE.MeshPhongMaterial({
+		color:0xffffff,
+		map:texture,
+	})
+	var spMesh=new THREE.Mesh(sphereGeo,sphMat);
+	scene.add(spMesh);
+	//椭圆
+	var curve = new THREE.EllipseCurve(
+		0,  0,            // ax, aY
+		1.5, 1.5,           // xRadius, yRadius
+		0,  2 * Math.PI,  // aStartAngle, aEndAngle
+		false,            // aClockwise
+		0           // aRotation
+	);
+
+	var points = curve.getPoints( 50 );
+	var geometry = new THREE.BufferGeometry().setFromPoints( points );
+	var material = new THREE.LineBasicMaterial( { color : 0xffffff } );
+	// Create the final object to add to the scene
+	var ellipse = new THREE.Line( geometry, material );
+	ellipse.rotateX(Math.PI/2);
+	scene.add(ellipse);
+	//月球
+	var texture2=new THREE.TextureLoader().load('__STATIC__/home/img/wo.jpg');
+	
+	var yueqiuG=new THREE.BoxGeometry(0.06,0.06,0.06);
+	var sphMat=new THREE.MeshPhongMaterial({
+		color:0xffffff,
+		map:texture2,
+	})
+	var yueqiu=new THREE.Mesh(yueqiuG,sphMat);
+	spMesh.add(yueqiu);
+	yueqiu.position.set(0,0,1.5);
+	
+</script>
+
+
+<!-- 大气层 -->
+<script type="text/javascript">
+	 // 创建一个大气层几何体，注意比地球几何体的半径略大一些
+	var geometry = new THREE.SphereBufferGeometry(1.02, 20, 20); //球体
+	var texture = new THREE.TextureLoader().load('__STATIC__/home/img/daqi.png');
+	// 设置重复的作用是：能够让一个效果循环
+	texture.wrapS = THREE.RepeatWrapping;
+	texture.wrapT = THREE.RepeatWrapping;
+	
+	// 自定义顶点着色器对象
+	var material = new THREE.ShaderMaterial({
+	  uniforms: {
+	    // texture对应顶点着色器中uniform声明的texture变量
+	    texture: {
+	      value: texture,
+	    },
+	    time: {
+	      value: 1.0
+	    },
+	  },
+	  // 顶点着色器
+	  vertexShader: document.getElementById('vertexShader').textContent,
+	  // 片元着色器
+	  fragmentShader: document.getElementById('fragmentShader').textContent,
+	  // 开启透明度
+	  transparent: true,
+	});
+	// 创建大气层网格模型
+	var dmesh = new THREE.Mesh(geometry, material);
+	scene.add(dmesh);	
+	
+	
+		
+	// 创建一个时钟对象Clock
+	var clock = new THREE.Clock();
+	function rend(){
+
+		// 获得两次渲染的时间间隔deltaTime
+		var deltaTime = clock.getDelta();
+		// 更新uniforms中时间，这样就可以更新着色器中time变量的值
+		material.uniforms.time.value += deltaTime;
+		renderer.render(scene,camera);
+		spMesh.rotateY(0.01);
+		requestAnimationFrame(rend);
+	}
+	rend();
+	
+	var control=new THREE.OrbitControls(camera,$('canvas')[0]);
+	
+	
+	
+</script>

@@ -1,0 +1,23 @@
+#exampleInputName2{
+	width: 82%;
+	display: inline-block;
+	vertical-align: top;
+}
+.navbar{
+	margin-bottom: 5px;
+}
+
+#ktvName,.form-inline{
+	padding: 3px;
+}
+.checkbox{
+	width: 20px;
+	height: 20px;
+}
+
+.nohave{
+	text-decoration: underline;
+}
+body{
+	background-image: url();
+}

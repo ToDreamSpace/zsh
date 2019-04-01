@@ -1,0 +1,61 @@
+{extend name='base'/}
+{block name='title'}关联地址{/block}
+{block name='three'}
+<script src="__STATIC__/home/js/three.js" type="text/javascript" charset="utf-8"></script>
+<script src="__STATIC__/home/js/OrbitControls.js" type="text/javascript" charset="utf-8"></script>
+{/block}
+{block name='content'}
+<div id="logo">
+	
+</div>
+	<div class="container">
+		<form>
+			<div class="form-group">
+				<h1></h1>
+				<input type="text" class="form-control" name="ktvName" id="ktvName" value="" placeholder="请输入地址索引"/>
+			</div>
+			<div class="list-group" id="ktvmx">
+				
+			</div>
+			<button type="button" id="guanlian" class="btn btn-success btn-lg">点击进入</button>
+		</form>
+	</div>
+{/block}
+{block name='script'}
+<script type="text/javascript">
+	// <!-- 获取ktvmx -->
+	$('#ktvName').on('input',function(){
+		$.post('{:url("index/index/ktvmx")}',
+		{
+			ktvName:$('#ktvName').val(),
+		}
+		,function(data){
+			$("#ktvmx").html('');
+			var tex1;
+			for(let index in data) {  
+				tex1=$("<div class=\"list-group-item\"></div>").attr('ktvid',data[index].id).text(data[index].ktvname); 
+				$("#ktvmx").append(tex1); 
+			};
+			// 写入input标签
+			$('.list-group-item').click(function(){
+				$('#ktvName').val($(this).text());
+				$('#guanlian').attr('ktvid',$(this).attr('ktvid'))
+				$("#ktvmx").html('');
+			})
+			
+		})
+	})
+	/*
+	 
+	 */
+	//关联场所
+	$('#guanlian').click(function(){
+		if($(this).attr('ktvid')){
+			window.location.href = "{:url('index/index/guanlian')}?ktvid="+$(this).attr('ktvid');
+		}else{
+			alert('请点击一下下面的明细');
+		}
+	})	
+</script>
+{include file="three"/}
+{/block}

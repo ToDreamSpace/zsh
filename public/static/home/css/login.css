@@ -1,0 +1,27 @@
+.btn-lg{
+	margin-right: 30%;
+	margin-left: 30%;
+	width: 40%;
+}
+#logo{
+	width: 100%;
+	text-align: center;
+	margin-top: 10vh;
+	margin-bottom: 5px;
+}
+.navbar-brand{
+	height: 100%;
+	padding: 0;
+	padding-left: 5px;
+	padding-top: 5px;
+}
+body{
+	width: 100%;
+	height: 100vh;
+	background-image:url(../img/back.png);
+	background-size:100% 100%;
+	background-repeat:no-repeat;
+}
+.container{
+	width: 90%;
+}

@@ -1,0 +1,120 @@
+{extend name='base'/}
+{block name="title"}{$ktvname}{/block}
+{block name='content'}
+<link rel="stylesheet" type="text/css" href="__STATIC__/home/css/list.css"/>
+<small id="ktvName" ktvid="{$ktvid}">
+	{$ktvname}
+</small>
+<!-- 歌曲搜索框 -->
+<form action="#" class="form-inline" >
+  <div class="form-group">
+    <input type="text" class="form-control" id="exampleInputName2" placeholder="搜索歌曲名">
+	<button type="button" id="search_button" class="btn btn-default">搜索</button>
+  </div>
+</form>
+<!-- 歌曲列表 -->
+<table class="table table-striped">
+	<tr>
+		<th>已点</th>
+		<th>ID</th>
+		<th>歌曲名称</th>
+		<th>演唱者</th>
+		<th>编辑</th>
+	</tr>
+	{volist name="songbase" id="vo"}
+	<tr>
+		<td>
+			<div class="switch switch-small">
+				<input class="checkbox" type="checkbox" guanxiid="{$vo.guanxiid}" songid={$vo.id}>
+			</div>
+		</td>
+		<td>{$vo.id}</td>
+		<td>{$vo.songname}</td>
+		<td>{$vo.singer}</td>
+		<td class="nohave" sta=0 songid={$vo.id} guanxiid="{$vo.guanxiid}">标记无</td>
+	</tr>
+	{/volist}
+</table>
+{/block}
+
+{block name="script"}
+
+<script type="text/javascript">
+	$(".checkbox[guanxiid='2']").hide();
+	$(".nohave[guanxiid='2']").css('color','red');
+	$(".nohave[guanxiid='2']").attr('sta','1');
+	$(".checkbox[guanxiid='1']").attr('checked',true);
+</script>
+
+
+<script type="text/javascript">
+		//置为没有
+	$(".nohave").click(function(){
+		var that=$(this);
+		console.log(that.attr('sta'));
+		if(that.attr('sta')==0){
+			$.post("{:url('index/index/setRalationNotHave')}",
+			{
+				songid:that.attr('songid'),
+				ktvid:$('#ktvName').attr('ktvid'),
+				guanxiid:2,
+				checked:1,
+			},
+			function(){
+				that.attr('sta','1');
+				that.css('color','red');
+				$('.checkbox[songid='+that.attr('songid')+']').hide();
+				$('.checkbox[songid='+that.attr('songid')+']').attr('checked',true);
+			})
+		}else{
+			$.post("{:url('index/index/setRalationNotHave')}",
+			{
+				songid:that.attr('songid'),
+				ktvid:$('#ktvName').attr('ktvid'),
+				guanxiid:2,
+				checked:0,
+			},
+			function(){
+				that.css('color','black');
+				that.attr('sta','0');
+				$('.checkbox[songid='+that.attr('songid')+']').attr('checked',false);
+				$('.checkbox[songid='+that.attr('songid')+']').show();
+			})
+		}
+	})
+	//置为已点击
+		$('.checkbox').click(function(){
+		if($(this).is(':checked')){
+			$.post("{:url('index/index/setRalation')}",
+			{
+				songid:$(this).attr('songid'),
+				ktvid:$('#ktvName').attr('ktvid'),
+				guanxiid:1,
+				checked:1,
+			},
+			function(data){
+				console.log(data);
+			})
+		}else{
+			$.post("{:url('index/index/setRalation')}",
+			{
+				songid:$(this).attr('songid'),
+				ktvid:$('#ktvName').attr('ktvid'),
+				guanxiid:1,
+				checked:0,
+			},
+			function(data){
+				console.log(data);
+			})
+		}
+	})
+	
+	
+	//搜索歌曲名称
+	$('#search_button').click(function(){
+		window.location.href="/zsh/public/index.php/index/index/guanlian?ktvid="+$('#ktvName').attr('ktvid')+'&'+"songn="+$('#exampleInputName2').val();
+	});
+	
+
+</script>
+{/block}
